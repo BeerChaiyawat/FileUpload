@@ -1,0 +1,208 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JS
+
+<PageTitle>Home</PageTitle>
+
+<div class="upload-container">
+	<h2>Upload File</h2>
+	<label for="file-upload" class="btn">Choose File</label>
+	<InputFile id="file-upload" OnChange="HandleFileSelected" />
+	<div class="progress-bar-container">
+		<div class="progress-bar" style="width:@progress%"></div>
+		<span class="progress-text">@progress%</span>
+	</div>
+	<p>@message</p>
+	<div class="file-preview-container">
+		@if (file != null)
+		{
+			<div class="file-preview-item">
+				@if (file.ContentType.StartsWith("image/"))
+				{
+					<img src="@filePreviewUrl" alt="Preview" class="file-preview" />
+				}
+				else if (file.ContentType == "application/pdf")
+				{
+					<embed src="@filePreviewUrl" type="application/pdf" class="file-preview" />
+				}
+				<button @onclick="RemoveFile" class="btn btn-danger">Delete</button>
+			</div>
+		}
+	</div>
+</div>
+
+
+@code {
+	private IBrowserFile? file;
+	private string? filePreviewUrl;
+	private int progress = 0;
+	private string message = string.Empty;
+	private string? filePath;
+
+	private async Task HandleFileSelected(InputFileChangeEventArgs e)
+	{
+		file = e.File;
+		var buffer = new byte[file.Size];
+		await file.OpenReadStream().ReadAsync(buffer);
+		var base64 = Convert.ToBase64String(buffer);
+		filePreviewUrl = $"data:{file.ContentType};base64,{base64}";
+
+		filePath = Path.Combine("G:\\ไดรฟ์ของฉัน\\Share\\UploadFile", file.Name);
+
+		try
+		{
+			using var stream = file.OpenReadStream();
+			using var fileStream = new FileStream(filePath, FileMode.Create);
+			await stream.CopyToAsync(fileStream);
+
+			// Simulate upload progress
+			for (int i = 0; i <= 100; i++)
+			{
+				progress = i;
+				await Task.Delay(50); // Simulate time delay for upload
+				StateHasChanged();
+			}
+
+			appState.filePreviewUrl = filePreviewUrl;
+
+			message = "File uploaded successfully!";
+			await JS.InvokeVoidAsync("Swal.fire", "Success", "File uploaded successfully!", "success");
+		}
+		catch (Exception ex)
+		{
+			message = $"Error: {ex.Message}";
+			await JS.InvokeVoidAsync("Swal.fire", "Error", $"Error: {ex.Message}", "error");
+		}
+	}
+
+	private async Task RemoveFile()
+	{
+		if (File.Exists(filePath))
+		{
+			File.Delete(filePath);
+			file = null;
+			filePreviewUrl = null;
+			progress = 0;
+			message = "File deleted successfully!";
+			await JS.InvokeVoidAsync("Swal.fire", "Deleted", "File deleted successfully!", "success");
+		}
+		else
+		{
+			message = "File not found!";
+			await JS.InvokeVoidAsync("Swal.fire", "Error", "File not found!", "error");
+		}
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		appState.filePreviewUrl = null;
+	}
+}
+
+<style>
+	/* Container for the upload section */
+	.upload-container {
+		max-width: 600px;
+		margin: auto;
+		padding: 20px;
+		background-color: #f9f9f9;
+		border-radius: 8px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		text-align: center;
+		transition: transform 0.3s ease-in-out;
+	}
+
+		.upload-container:hover {
+			transform: scale(1.05);
+		}
+
+	/* Style for the progress bar container */
+	.progress-bar-container {
+		position: relative;
+		height: 20px;
+		background-color: #e0e0e0;
+		border-radius: 5px;
+		margin-top: 10px;
+	}
+
+	/* Style for the progress bar */
+	.progress-bar {
+		height: 100%;
+		background-color: #4caf50;
+		border-radius: 5px;
+		transition: width 0.3s, background-color 0.3s;
+	}
+
+		.progress-bar:hover {
+			background-color: #45a049;
+		}
+
+	/* Style for the progress text */
+	.progress-text {
+		position: absolute;
+		top: 0;
+		left: 50%;
+		transform: translateX(-50%);
+		color: white;
+		font-weight: bold;
+	}
+
+	/* Style for the upload button */
+	input[type="file"] {
+		display: none;
+	}
+
+	label.btn {
+		background-color: #007bff;
+		color: white;
+		padding: 10px 20px;
+		border-radius: 5px;
+		cursor: pointer;
+		transition: background-color 0.3s, transform 0.3s;
+	}
+
+		label.btn:hover {
+			background-color: #0056b3;
+			transform: scale(1.1);
+		}
+
+	/* Style for file previews */
+	.file-preview-container {
+		margin-top: 20px;
+	}
+
+	.file-preview-item {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		background: #fff;
+		padding: 10px;
+		border-radius: 5px;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+		margin-bottom: 10px;
+	}
+
+	.file-preview {
+		max-width: 100px;
+		max-height: 100px;
+		margin-right: 10px;
+		border: 1px solid #ddd;
+		border-radius: 5px;
+	}
+
+	.btn-danger {
+		background-color: #dc3545;
+		color: white;
+		border: none;
+		padding: 5px 10px;
+		border-radius: 5px;
+		cursor: pointer;
+		transition: background-color 0.3s, transform 0.3s;
+	}
+
+		.btn-danger:hover {
+			background-color: #c82333;
+			transform: scale(1.1);
+		}
+
+</style>

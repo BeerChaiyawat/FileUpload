@@ -1,0 +1,26 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page">
+	<div class="sidebar">
+		<!-- ตัวอย่าง Sidebar เนวิเกชัน -->
+		<NavMenu />
+	</div>
+
+	<div class="main">
+		<div class="top-row px-4">
+			
+		</div>
+
+		<div class="content px-4">
+			@Body
+		</div>
+	</div>
+</div>
+
+<Preload LoadingText="Loading..." />
+
+<div id="blazor-error-ui">
+	An unhandled error has occurred.
+	<a href="" class="reload">Reload</a>
+	<a class="dismiss">🗙</a>
+</div>

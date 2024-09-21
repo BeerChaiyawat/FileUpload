@@ -1,0 +1,68 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <Icon Name="IconName.FileArrowDown" Color="IconColor.White" Size="IconSize.x4" class="pe-1" />
+        <a class="navbar-brand" href="">FileUpload</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()" style="display:@(isMenuVisible ? "block" : "none")">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <Icon Name="IconName.House" Size="IconSize.x4" class="pe-1" />
+                <span aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <Icon Name="IconName.PlusSquareFill" Size="IconSize.x4" class="pe-1" />
+                <span class="" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <Icon Name="IconName.ListNested" Size="IconSize.x4" class="pe-1" />
+                <span aria-hidden="true"></span> Weather
+            </NavLink>
+        </div>
+
+        @if (UserHasAccessToFacebook)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="facebooklogin">
+                    <Icon Name="IconName.Facebook" Size="IconSize.x4" Color="IconColor.Primary" class="pe-1" />
+                    <span class="" aria-hidden="true"></span> Facebook
+                </NavLink>
+            </div>
+        }
+    </nav>
+</div>
+
+@code{
+    private bool isMenuVisible = false;
+    private bool UserHasAccessToFacebook = false;
+
+    protected override void OnInitialized()
+    {
+        ToggleMenu();
+        // ตรวจสอบสิทธิ์หรือบทบาทของผู้ใช้
+        UserHasAccessToFacebook = CheckUserAccess();
+    }
+
+    private void ToggleMenu()
+    {
+        isMenuVisible = true;
+    }
+
+    private bool CheckUserAccess()
+    {
+        // เพิ่มโค้ดสำหรับตรวจสอบสิทธิ์หรือบทบาทของผู้ใช้
+        // ตัวอย่างเช่น:
+        // return User.IsInRole("FacebookAccess");
+        return false; // เปลี่ยนเป็นเงื่อนไขจริง
+    }
+}

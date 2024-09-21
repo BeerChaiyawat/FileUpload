@@ -1,0 +1,83 @@
+﻿@page "/weather"
+@attribute [StreamRendering]
+
+<PageTitle>Weather</PageTitle>
+
+<h1>Weather</h1>
+
+<p>This component demonstrates showing data.</p>
+
+<img src="@filePreviewUrl" alt="Preview" class="file-preview" />
+
+<Grid TItem="WeatherForecast"
+	  Class="table table-hover table-bordered table-striped"
+	  DataProvider="WeatherForecastsDataProvider"
+	  AllowPaging="true"
+	  PageSize="5"
+	  Responsive="true">
+
+	<GridColumns>
+		<GridColumn TItem="WeatherForecast" HeaderText="Id">
+			@context.Id
+		</GridColumn>
+		<GridColumn TItem="WeatherForecast" HeaderText="WeatherForecast Date">
+			@context.Date
+		</GridColumn>
+		<GridColumn TItem="WeatherForecast" HeaderText="TemperatureC">
+			@context.TemperatureC
+		</GridColumn>
+		<GridColumn TItem="WeatherForecast" HeaderText="Summary">
+			@context.Summary
+		</GridColumn>
+		<GridColumn TItem="WeatherForecast" HeaderText="TemperatureF">
+			@context.TemperatureF
+		</GridColumn>
+	</GridColumns>
+
+</Grid>
+
+@code {
+	private IEnumerable<WeatherForecast> weatherForecasts = default!;
+
+	private string filePreviewUrl;
+
+	protected override async Task OnInitializedAsync()
+	{
+		if (!string.IsNullOrEmpty(appState.filePreviewUrl))
+		{
+			filePreviewUrl = appState.filePreviewUrl;
+		}
+	}
+
+	private async Task<GridDataProviderResult<WeatherForecast>> WeatherForecastsDataProvider(GridDataProviderRequest<WeatherForecast> request)
+	{
+		if (weatherForecasts is null) // pull employees only one time for client-side filtering, sorting, and paging
+			weatherForecasts = GetWeatherForecasts(); // call a service or an API to pull the employees
+
+		return await Task.FromResult(request.ApplyTo(weatherForecasts));
+	}
+	private IEnumerable<WeatherForecast> GetWeatherForecasts()
+	{
+		// Simulate asynchronous loading to demonstrate streaming rendering
+		Task.Delay(500);
+
+		var startDate = DateOnly.FromDateTime(DateTime.Now);
+		var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
+		return Enumerable.Range(1, 1000000).Select(index => new WeatherForecast
+			{
+				Id = Guid.NewGuid().ToString("D"),
+				Date = startDate.AddDays(index),
+				TemperatureC = Random.Shared.Next(-20, 55),
+				Summary = summaries[Random.Shared.Next(summaries.Length)]
+			}).ToList();
+	}
+
+	private class WeatherForecast
+	{
+		public required string Id { get; set; }
+		public DateOnly Date { get; set; }
+		public int TemperatureC { get; set; }
+		public string? Summary { get; set; }
+		public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+	}
+}

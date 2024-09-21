@@ -1,0 +1,51 @@
+﻿@page "/facebooklogin"
+@using Microsoft.AspNetCore.Components.Web
+@inject NavigationManager Navigation
+
+<h3>FacebookLogin</h3>
+
+<div class="login-container">
+    <div class="login-box">
+        <h2>Login</h2>
+        <button @onclick="LoginWithFacebook" class="btn btn-primary">Login with Facebook</button>
+    </div>
+</div>
+
+@code {
+    private void LoginWithFacebook()
+    {
+        Navigation.NavigateTo("authentication/login");
+    }
+}
+
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f2f5;
+    }
+
+    .login-box {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .btn {
+        background-color: #1877f2;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        .btn:hover {
+            background-color: #145dbf;
+        }
+
+</style>
